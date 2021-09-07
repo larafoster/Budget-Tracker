@@ -1,6 +1,7 @@
 # Misc
 s-backup.js
-db-backup.js
+test.js
+backup.js
 # Logs
 logs
 *.log
