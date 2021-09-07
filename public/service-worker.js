@@ -22,7 +22,17 @@ self.addEventListener('install', (event) => {
       .then(self.skipWaiting())
   );
 });
-
+self.addEventListener('fetch', (event) => {
+    event.respondWith(
+        fetch(event.request)
+          .catch(() => {
+            return caches.open(PRECACHE)
+              .then((cache) => {
+                return cache.match(event.request)
+              })
+          })
+    )
+})
 // The activate handler takes care of cleaning up old caches.
 self.addEventListener('activate', (event) => {
     event.waitUntil(
@@ -39,14 +49,3 @@ self.addEventListener('activate', (event) => {
     )
 });
 
-self.addEventListener('fetch', (event) => {
-    event.respondWith(
-        fetch(event.request)
-          .catch(() => {
-            return caches.open(PRECACHE)
-              .then((cache) => {
-                return cache.match(event.request)
-              })
-          })
-    )
-})
