@@ -1,22 +1,23 @@
+//https://developers.google.com/web/fundamentals/primers/service-workers
+var CACHE_NAME = 'my-site-cache-v1';
+var DATA_CACHE_NAME = "data-cache-v1"; //13-Caching_Fetching
 const FILES_TO_CACHE = [
-  '/',
-  '/db.js',
-  '/index.js',
-  '/manifest.webmanifest',
-  '/styles.css',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png',
-  'https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css',
-  'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css'
+    "/",
+    "manifest.json",
+    "index.html",
+    "index.js",
+    "styles.css",
+    "db.js",
+    "icons/icon-192x192.png",
+    "icons/icon-512x512.png",
+    "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css",
+    "https://cdn.jsdelivr.net/npm/chart.js@2.8.0"
 ];
-
-const PRECACHE = 'precache-v1';
-const RUNTIME = 'runtime';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches
-      .open(PRECACHE)
+      .open(CACHE_NAME)
       .then((cache) => cache.addAll(FILES_TO_CACHE))
       .then(self.skipWaiting())
   );
@@ -24,7 +25,7 @@ self.addEventListener('install', (event) => {
 
 // The activate handler takes care of cleaning up old caches.
 self.addEventListener('activate', (event) => {
-  const currentCaches = [PRECACHE, RUNTIME];
+  const currentCaches = [CACHE_NAME, DATA_CACHE_NAME];
   event.waitUntil(
     caches
       .keys()
@@ -50,7 +51,7 @@ self.addEventListener('fetch', (event) => {
           return cachedResponse;
         }
 
-        return caches.open(RUNTIME).then((cache) => {
+        return caches.open(DATA_CACHE_NAME).then((cache) => {
           return fetch(event.request).then((response) => {
             return cache.put(event.request, response.clone()).then(() => {
               return response;
