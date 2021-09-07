@@ -1,3 +1,5 @@
+let db;
+
 //https://www.tutorialspoint.com/html5/html5_indexeddb.htm
 const indexedDB =
 window.indexedDB ||
@@ -5,7 +7,6 @@ window.mozIndexedDB ||
 window.webkitIndexedDB || 
 window.msIndexedDB;
 
-let db;
 // Create a new db request for a "budget" database.
 const request = indexedDB.open("budget", 1);
 
