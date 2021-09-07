@@ -4,7 +4,6 @@ var DATA_CACHE_NAME = "data-cache-v1"; //13-Caching_Fetching
 const FILES_TO_CACHE = [
     "/",
     "manifest.json",
-    "index.html",
     "index.js",
     "styles.css",
     "db.js",
