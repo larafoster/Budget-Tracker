@@ -42,9 +42,8 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-self.addEventListener("fetch", function (event) {
-    // cache successful requests to the API
-    if (event.request.url.includes("/api/")) {
+self.addEventListener('fetch', (event) => {
+  if (event.request.url.startsWith(self.location.origin)) {
         event.respondWith(
             caches.open(DATA_CACHE_NAME).then(cache => {
                 return fetch(event.request)
