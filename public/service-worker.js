@@ -11,13 +11,13 @@ const FILES_TO_CACHE = [
     "https://cdn.jsdelivr.net/npm/chart.js@2.8.0"
 ];
 
-const CACHE_NAME = 'static-cache-v2';
-const DATA_CACHE_NAME = 'data-cache-v1';
+const PRECACHE = 'precache-v1';
+const RUNTIME = 'runtime';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches
-      .open(CACHE_NAME)
+      .open(PRECACHE)
       .then((cache) => cache.addAll(FILES_TO_CACHE))
       .then(self.skipWaiting())
   );
@@ -25,11 +25,12 @@ self.addEventListener('install', (event) => {
 
 // The activate handler takes care of cleaning up old caches.
 self.addEventListener('activate', (event) => {
+  const currentCaches = [PRECACHE, RUNTIME];
   event.waitUntil(
     caches
       .keys()
       .then((cacheNames) => {
-        return cacheNames.filter((cacheName) => !CACHE_NAME.includes(cacheName));
+        return cacheNames.filter((cacheName) => !currentCaches.includes(cacheName));
       })
       .then((cachesToDelete) => {
         return Promise.all(
