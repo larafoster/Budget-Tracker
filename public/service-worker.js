@@ -44,25 +44,20 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.url.startsWith(self.location.origin)) {
-        event.respondWith(
-            caches.open(DATA_CACHE_NAME).then(cache => {
-                return fetch(event.request)
-                    .then(response => {
-                        // If the response was good, clone it and store it in the cache.
-                        if (response.status === 200) {
-                            cache.put(event.request.url, response.clone());
-                        }
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse;
+        }
 
-                        return response;
-                    })
-                    .catch(err => {
-                        // Network request failed, try to get it from the cache.
-                        return cache.match(event.request);
-                    });
-            }).catch(err => console.log(err))
-        );
-
-        return;
-    }
-    
+        return caches.open(RUNTIME).then((cache) => {
+          return fetch(event.request).then((response) => {
+            return cache.put(event.request, response.clone()).then(() => {
+              return response;
+            });
+          });
+        });
+      })
+    );
+  }
 });
