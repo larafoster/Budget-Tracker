@@ -15,33 +15,49 @@ const CACHE_NAME = 'static-cache-v2';
 const DATA_CACHE_NAME = 'data-cache-v1';
 
 self.addEventListener('install', (event) => {
-  console.log('[Service Worker] Install');
-  event.waitUntil((async () => {
-    const cache = await caches.open(CACHE_NAME);
-    console.log('[Service Worker] Caching all: app shell and content');
-    await cache.addAll(FILES_TO_CACHE);
-  })());
+  event.waitUntil(
+    caches
+      .open(CACHE_NAME)
+      .then((cache) => cache.addAll(FILES_TO_CACHE))
+      .then(self.skipWaiting())
+  );
 });
 
 // The activate handler takes care of cleaning up old caches.
-self.addEventListener('fetch', (event) => {
-  event.respondWith((async () => {
-    const r = await caches.match(event.request);
-    console.log(`[Service Worker] Fetching resource: ${event.request.url}`);
-    if (r) { return r; }
-    const response = await fetch(event.request);
-    const cache = await caches.open(CACHE_NAME);
-    console.log(`[Service Worker] Caching new resource: ${event.request.url}`);
-    cache.put(event.request, response.clone());
-    return response;
-  })());
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches
+      .keys()
+      .then((cacheNames) => {
+        return cacheNames.filter((cacheName) => !CACHE_NAME.includes(cacheName));
+      })
+      .then((cachesToDelete) => {
+        return Promise.all(
+          cachesToDelete.map((cacheToDelete) => {
+            return caches.delete(cacheToDelete);
+          })
+        );
+      })
+      .then(() => self.clients.claim())
+  );
 });
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil(caches.keys().then((keyList) => {
-    Promise.all(keyList.map((key) => {
-      if (key === CACHE_NAME) { return; }
-      caches.delete(key);
-    }))
-  }));
+self.addEventListener('fetch', (event) => {
+  if (event.request.url.startsWith(self.location.origin)) {
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+
+        return caches.open(DATA_CACHE_NAME).then((cache) => {
+          return fetch(event.request).then((response) => {
+            return cache.put(event.request, response.clone()).then(() => {
+              return response;
+            });
+          });
+        });
+      })
+    );
+  }
 });
