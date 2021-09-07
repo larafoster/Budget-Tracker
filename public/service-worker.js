@@ -42,22 +42,28 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-self.addEventListener('fetch', (event) => {
-  if (event.request.url.startsWith(self.location.origin)) {
-    event.respondWith(
-      caches.match(event.request).then((cachedResponse) => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
+self.addEventListener("fetch", function (event) {
+    // cache successful requests to the API
+    if (event.request.url.includes("/api/")) {
+        event.respondWith(
+            caches.open(DATA_CACHE_NAME).then(cache => {
+                return fetch(event.request)
+                    .then(response => {
+                        // If the response was good, clone it and store it in the cache.
+                        if (response.status === 200) {
+                            cache.put(event.request.url, response.clone());
+                        }
 
-        return caches.open(DATA_CACHE_NAME).then((cache) => {
-          return fetch(event.request).then((response) => {
-            return cache.put(event.request, response.clone()).then(() => {
-              return response;
-            });
-          });
-        });
-      })
-    );
-  }
+                        return response;
+                    })
+                    .catch(err => {
+                        // Network request failed, try to get it from the cache.
+                        return cache.match(event.request);
+                    });
+            }).catch(err => console.log(err))
+        );
+
+        return;
+    }
+    
 });
