@@ -13,9 +13,7 @@ This is a progressive app that allows the user to manage their budget whether th
   Once you clone this repository, you will need to follow these steps:
   1. Connect to your mongoose server. 
   2. Install the node modules, by running npm install.
-  3. There is a seed file to get started with prepopulated data. Simple type: 
-  `npm run seed` in the terminal.
-  5. To start the app, type `node server` in the terminal.
+  3. To start the app, type `node server` in the terminal.
   
   ## Features
   The user can add transactions as deposits or expenses by entering the following:
