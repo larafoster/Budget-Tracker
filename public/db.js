@@ -1,9 +1,11 @@
+// https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB
+//In the following line, you should include the prefixes of implementations you want to test.
+
 const indexedDB =
   window.indexedDB ||
   window.mozIndexedDB ||
   window.webkitIndexedDB ||
-  window.msIndexedDB ||
-  window.shimIndexedDB;
+  window.msIndexedDB 
 
 let db;
 const request = indexedDB.open("budget", 1);
@@ -23,7 +25,7 @@ request.onsuccess = ({ target }) => {
 };
 
 request.onerror = function(event) {
-  console.log("Woops! " + event.target.errorCode);
+  console.log("Something went wrong! " + event.target.errorCode);
 };
 
 function saveRecord(record) {
