@@ -25,9 +25,7 @@ This is a progressive app that allows the user to manage their budget whether th
     * The total budeget balance is calculated as soon as funds are entered
 
   Screenshots of app:
-  - [img of notes home page](/budget-tracker.png)
-  - [/budget-tracker.png](/budget-tracker.png)    
-
+  ![PWA Budget Tracker Screenshot](budget-tracker.png)
 
 The graph portrays the total funds over time by date entered for each transaction
   ### Links
